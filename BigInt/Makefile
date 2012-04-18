@@ -6,5 +6,9 @@ BigInt.o:		BigInt.cpp BigInt.h
 BigInt_Extend.o:	BigInt_Extend.cpp BigInt_Extend.h	
 	g++ BigInt_Extend.cpp -c
 
+debug:	
+	g++ BigInt.cpp -g -c
+	g++ BigInt_Extend.cpp -g -c
+
 clean:
 	rm *.o

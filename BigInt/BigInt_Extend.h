@@ -101,7 +101,8 @@ struct unsigned_BigInt
 			printf("0");
 			return;
 		}
-		static Dec_BigInt V = 0;
+		static Dec_BigInt V;
+		V = 0;
 		for (int i = len - 1; i >= 0; -- i)
 			V = V * base + __data[i];
 		V.print();
@@ -143,6 +144,8 @@ unsigned_BigInt operator / (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
 unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
+unsigned_BigInt unsigned_read();
+
 
 
 struct signed_BigInt
@@ -166,7 +169,7 @@ struct signed_BigInt
 	
 	void print()
 	{
-		if (sign == -1) printf("-1");
+		if (sign == -1) printf("-");
 		data.print();
 	}
 };
@@ -186,6 +189,8 @@ signed_BigInt operator * (const signed_BigInt &A, const signed_BigInt &B);
 signed_BigInt operator / (const signed_BigInt &A, const signed_BigInt &B);
 
 signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B);
+
+signed_BigInt signed_read();
 
 const unsigned_BigInt unsigned_Zero = 0;
 const unsigned_BigInt unsigned_One = 1;

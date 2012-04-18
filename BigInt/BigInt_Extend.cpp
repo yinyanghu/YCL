@@ -1,5 +1,10 @@
 #include "BigInt_Extend.h"
 
+/****************************************************************
+ * Unsigned Big Integer						*
+ ****************************************************************/
+
+
 
 Dec_BigInt operator + (const Dec_BigInt &A, const Dec_BigInt &B)
 {
@@ -339,6 +344,28 @@ unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B)
 
 }
 
+unsigned_BigInt unsigned_read()
+{
+	unsigned_BigInt ret = 0;
+	char ch;
+	while ((ch = getc(stdin)) > ' ')
+		ret = ret * 10 + (int(ch) - int('0'));
+	return ret;
+}
+	
+
+
+
+
+
+
+
+
+/****************************************************************
+ * Signed Big Integer						*
+ ****************************************************************/
+
+
 
 inline int compare(const signed_BigInt &A, const signed_BigInt &B)
 {
@@ -506,5 +533,25 @@ signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B)
 		R.data = B.data - A.data % B.data;
 	return R;
 }
+
+
+signed_BigInt signed_read()
+{
+	signed_BigInt ret;
+	char ch;
+	ch = getc(stdin);
+	if (ch == '-')
+		ret.sign = -1;
+	else
+	{
+		ret.sign = 1;
+		ungetc(ch, stdin);
+	}
+	ret.data = unsigned_read();
+	if (compare(ret.data, unsigned_Zero) == 0)
+		ret.sign = 0;
+	return ret;
+}
+
 
 

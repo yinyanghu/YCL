@@ -1,5 +1,9 @@
 #include "BigInt.h"
 
+/****************************************************************
+ * Unsigned Big Integer						*
+ ****************************************************************/
+
 inline int compare(const unsigned_BigInt &A, const unsigned_BigInt &B)
 {
 	if (A.len != B.len) return A.len > B.len ? 1 : -1;
@@ -163,6 +167,27 @@ unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B)
 	return Carry;
 
 }
+
+unsigned_BigInt unsigned_read()
+{
+	unsigned_BigInt ret = 0;
+	char ch;
+	while ((ch = getc(stdin)) > ' ')
+		ret = ret * 10 + (int(ch) - int('0'));
+	return ret;
+}
+	
+
+
+
+
+
+
+
+
+/****************************************************************
+ * Signed Big Integer						*
+ ****************************************************************/
 
 inline int compare(const signed_BigInt &A, const signed_BigInt &B)
 {
@@ -330,4 +355,24 @@ signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B)
 		R.data = B.data - A.data % B.data;
 	return R;
 }
+
+
+signed_BigInt signed_read()
+{
+	signed_BigInt ret;
+	char ch;
+	ch = getc(stdin);
+	if (ch == '-')
+		ret.sign = -1;
+	else
+	{
+		ungetc(ch, stdin);
+		ret.sign = 1;
+	}
+	ret.data = unsigned_read();
+	if (compare(ret.data, unsigned_Zero) == 0)
+		ret.sign = 0;
+	return ret;
+}
+
 

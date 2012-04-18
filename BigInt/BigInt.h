@@ -42,6 +42,7 @@ struct unsigned_BigInt
 	}
 	int & operator [] (int Index) { return __data[Index]; }
 	int operator [] (int Index) const { return __data[Index]; }
+
 	
 	void print()
 	{
@@ -79,6 +80,8 @@ unsigned_BigInt operator / (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
 unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
+unsigned_BigInt unsigned_read();
+
 struct signed_BigInt
 {
 	unsigned_BigInt data;
@@ -100,7 +103,7 @@ struct signed_BigInt
 
 	void print()
 	{
-		if (sign == -1) printf("-1");
+		if (sign == -1) printf("-");
 		data.print();
 	}
 };
@@ -118,6 +121,8 @@ signed_BigInt operator * (const signed_BigInt &A, const signed_BigInt &B);
 signed_BigInt operator / (const signed_BigInt &A, const signed_BigInt &B);
 
 signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B);
+
+signed_BigInt signed_read();
 
 
 const unsigned_BigInt unsigned_Zero = 0;
