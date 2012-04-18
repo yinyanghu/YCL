@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <cstring>
-#include <cstdlib>
+#include "Math.h"
 
 #define capacity		100
 #define base			0x40000000  // 2^30
@@ -10,20 +10,6 @@
 #define base_mod		0x3FFFFFFF
 #define base_dec		1000000000
 #define exponentiation_size	1500	
-
-inline int sgn(int key)
-{
-	if (key > 0) return 1;
-	if (key < 0) return -1;
-	if (key == 0) return 0;
-}
-
-inline int abs(int key)
-{
-	return (key < 0) ? -key : key;
-}
-
-
 
 struct Dec_BigInt
 {
@@ -157,7 +143,7 @@ struct signed_BigInt
 	{
 		data = source.data;
 	}
-	signed_BigInt(int key) : sign(sgn(key)), data(abs(key)) {}
+	signed_BigInt(int key) : sign(SGN(key)), data(ABS(key)) {}
 	signed_BigInt & operator = (const signed_BigInt &key)
 	{
 		sign = key.sign;

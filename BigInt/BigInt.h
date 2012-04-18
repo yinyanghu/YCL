@@ -1,22 +1,10 @@
 #include <cstdio>
 #include <cstring>
-#include <cstdlib>
+#include "Math.h"
 
 #define capacity		100
 #define base			1000000000
 #define base_bit		30
-
-inline int sgn(int key)
-{
-	if (key > 0) return 1;
-	if (key < 0) return -1;
-	if (key == 0) return 0;
-}
-
-inline int abs(int key)
-{
-	return (key < 0) ? -key : key;
-}
 
 struct unsigned_BigInt
 {
@@ -91,7 +79,7 @@ struct signed_BigInt
 	{
 		data = source.data;
 	}
-	signed_BigInt(int key) : sign(sgn(key)), data(abs(key)) {}
+	signed_BigInt(int key) : sign(SGN(key)), data(ABS(key)) {}
 	signed_BigInt & operator = (const signed_BigInt &key)
 	{
 		sign = key.sign;

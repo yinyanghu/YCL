@@ -6,6 +6,8 @@ using namespace std;
 int main()
 {
 
+	printf("%d", ABS(-1));
+
 	unsigned_BigInt A, B;
 	A = unsigned_read();
 	B = unsigned_read();
