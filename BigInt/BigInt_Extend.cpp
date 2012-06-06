@@ -4,6 +4,11 @@
  * Unsigned Big Integer						*
  ****************************************************************/
 
+const unsigned_BigInt	unsigned_Zero = 0;
+const unsigned_BigInt	unsigned_One = 1;
+const signed_BigInt	Zero = 0;
+const signed_BigInt	One = 1;
+const signed_BigInt	Minus_One = -1;
 
 
 Dec_BigInt operator + (const Dec_BigInt &A, const Dec_BigInt &B)
@@ -42,7 +47,7 @@ Dec_BigInt operator * (const Dec_BigInt &A, const int B)
 
 
 
-inline int compare(const unsigned_BigInt &A, const unsigned_BigInt &B)
+int compare(const unsigned_BigInt &A, const unsigned_BigInt &B)
 {
 	if (A.len != B.len) return A.len > B.len ? 1 : -1;
 	int i;
@@ -258,7 +263,7 @@ unsigned_BigInt multiply(const unsigned_BigInt &A, unsigned_BigInt B)
 
 
 
-inline void divide(const unsigned_BigInt &A, const unsigned_BigInt &B, unsigned_BigInt &Q, unsigned_BigInt &R)
+void divide(const unsigned_BigInt &A, const unsigned_BigInt &B, unsigned_BigInt &Q, unsigned_BigInt &R)
 {
 	static bool flag[exponentiation_size];  //odd ---> true, even ---> false
 	static int top;
@@ -344,12 +349,14 @@ unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B)
 
 }
 
-unsigned_BigInt unsigned_read()
+unsigned_BigInt unsigned_read(char *s)
 {
 	unsigned_BigInt ret = 0;
-	char ch;
-	while ((ch = getc(stdin)) > ' ')
-		ret = ret * 10 + (int(ch) - int('0'));
+	while (*s != 0)
+	{
+		ret = ret * 10 + (int(*s) - int('0'));
+		++ s;
+	}
 	return ret;
 }
 	
@@ -367,7 +374,7 @@ unsigned_BigInt unsigned_read()
 
 
 
-inline int compare(const signed_BigInt &A, const signed_BigInt &B)
+int compare(const signed_BigInt &A, const signed_BigInt &B)
 {
 	if (A.sign > B.sign) return 1;
 	if (A.sign < B.sign) return -1;
@@ -535,19 +542,19 @@ signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B)
 }
 
 
-signed_BigInt signed_read()
+signed_BigInt signed_read(char *s)
 {
 	signed_BigInt ret;
-	char ch;
-	ch = getc(stdin);
-	if (ch == '-')
+	if (s[0] == '-')
+	{
 		ret.sign = -1;
+		ret.data = unsigned_read(s + 1);
+	}
 	else
 	{
 		ret.sign = 1;
-		ungetc(ch, stdin);
+		ret.data = unsigned_read(s);
 	}
-	ret.data = unsigned_read();
 	if (compare(ret.data, unsigned_Zero) == 0)
 		ret.sign = 0;
 	return ret;
@@ -555,3 +562,72 @@ signed_BigInt signed_read()
 
 
 
+/****************************************************************
+ * Mathematics Operation
+ ****************************************************************/
+
+bool is_even(const unsigned_BigInt &A)
+{
+	if (A.len == 0) return true;
+	return ((A[0] & 1) == 0);
+}
+
+bool is_odd(const unsigned_BigInt &A)
+{
+	if (A.len == 0) return false;
+	return ((A[0] & 1) != 0);
+}
+
+unsigned_BigInt Euclid_GCD(const unsigned_BigInt &A, const unsigned_BigInt &B)
+{
+	return (B.len == 0) ? A : Euclid_GCD(B, A % B);
+}
+
+
+signed_BigInt Extended_Euclid_GCD(const signed_BigInt &A, const signed_BigInt &B, signed_BigInt &X, signed_BigInt &Y)
+{
+	if (B.sign == 0)
+	{
+		X = 1, Y = 0;
+		return A;
+	}
+	else
+	{
+		signed_BigInt XX, YY;
+		signed_BigInt D = Extended_Euclid_GCD(B, A % B, XX, YY);
+		X = YY, Y = XX - (A / B) * YY;
+		return D;
+	}
+	
+}
+
+unsigned_BigInt Get_Random(const int bits)
+{
+	unsigned_BigInt	Ret = 0;
+	if (bits > 1) Ret = (rand() % 9 + 1);
+	int i;
+	for (i = 2; i + base_dec_bit - 1 < bits; i += base_dec_bit)
+	{
+		int k = 0;
+		for (int j = 1; j <= base_dec_bit; ++ j)
+			k = k * 10 + rand() % 10;
+		Ret = Ret * base + k;
+	}
+	for (int j = i; j < bits; ++ j)
+		Ret = Ret * 10 + (rand() % 10);
+
+	return Ret;
+}
+
+unsigned_BigInt	Modular_Exponentiation(unsigned_BigInt A, unsigned_BigInt B, const unsigned_BigInt &N)
+{
+	unsigned_BigInt	Ret = 1;
+	while (B.len != 0)
+	{
+		if ((B[0] & 1) != 0)
+			Ret = (Ret * A) % N;
+		A = (A * A) % N;
+		shift_right(B);
+	}
+	return Ret;
+}

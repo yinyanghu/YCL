@@ -1,6 +1,18 @@
+#ifndef	__CSTDIO__
+#define __CSTDIO__
 #include <cstdio>
+#endif
+
+#ifndef	__CSTRING__
+#define __CSTRING__
 #include <cstring>
-#include "Math.h"
+#endif
+
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+#define MAX(X,Y) ((X) < (Y) ? (Y) : (X))
+#define ABS(X) ((X) < 0 ? (-X) : (X))
+#define SGN(X) ((X) == 0 ? 0 : (((X) > 0) ? 1 : -1))
+
 
 #define capacity		100
 #define base			1000000000
@@ -68,7 +80,7 @@ unsigned_BigInt operator / (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
 unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
-unsigned_BigInt unsigned_read();
+unsigned_BigInt unsigned_read(char *s);
 
 struct signed_BigInt
 {
@@ -110,7 +122,7 @@ signed_BigInt operator / (const signed_BigInt &A, const signed_BigInt &B);
 
 signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B);
 
-signed_BigInt signed_read();
+signed_BigInt signed_read(char *s);
 
 
 const unsigned_BigInt unsigned_Zero = 0;

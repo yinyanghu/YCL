@@ -12,4 +12,3 @@ debug:
 
 clean:
 	rm *.o
-	rm a.out

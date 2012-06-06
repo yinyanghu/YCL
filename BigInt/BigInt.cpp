@@ -168,12 +168,14 @@ unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B)
 
 }
 
-unsigned_BigInt unsigned_read()
+unsigned_BigInt unsigned_read(char *s)
 {
 	unsigned_BigInt ret = 0;
-	char ch;
-	while ((ch = getc(stdin)) > ' ')
-		ret = ret * 10 + (int(ch) - int('0'));
+	while (*s != 0)
+	{
+		ret = ret * 10 + (int(*s) - int('0'));
+		++ s;
+	}
 	return ret;
 }
 	
@@ -357,19 +359,19 @@ signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B)
 }
 
 
-signed_BigInt signed_read()
+signed_BigInt signed_read(char *s)
 {
 	signed_BigInt ret;
-	char ch;
-	ch = getc(stdin);
-	if (ch == '-')
+	if (s[0] == '-')
+	{
 		ret.sign = -1;
+		ret.data = unsigned_read(s + 1);
+	}
 	else
 	{
-		ungetc(ch, stdin);
 		ret.sign = 1;
+		ret.data = unsigned_read(s);
 	}
-	ret.data = unsigned_read();
 	if (compare(ret.data, unsigned_Zero) == 0)
 		ret.sign = 0;
 	return ret;

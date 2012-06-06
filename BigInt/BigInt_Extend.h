@@ -1,11 +1,28 @@
+#ifndef	__CSTDIO__
+#define __CSTDIO__
 #include <cstdio>
+#endif
+
+#ifndef	__CSTRING__
+#define __CSTRING__
 #include <cstring>
-#include "Math.h"
+#endif
+
+#ifndef	__CSTDLIB__
+#define __CSTDLIB__
+#include <cstdlib>
+#endif
+
+#define MIN(X,Y) ((X) < (Y) ? (X) : (Y))
+#define MAX(X,Y) ((X) < (Y) ? (Y) : (X))
+#define ABS(X) ((X) < 0 ? (-X) : (X))
+#define SGN(X) ((X) == 0 ? 0 : (((X) > 0) ? 1 : -1))
+
 
 #define capacity		100
 #define base			0x40000000  // 2^30
 #define __base			0x20000000  // 2^29
-//#define base_dec_bit 9
+#define base_dec_bit 9
 #define base_bit		30
 #define base_mod		0x3FFFFFFF
 #define base_dec		1000000000
@@ -96,7 +113,7 @@ struct unsigned_BigInt
 
 };
 
-inline int compare(const unsigned_BigInt &A, const unsigned_BigInt &B);
+int compare(const unsigned_BigInt &A, const unsigned_BigInt &B);
 
 
 
@@ -130,7 +147,7 @@ unsigned_BigInt operator / (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
 unsigned_BigInt operator % (const unsigned_BigInt &A, const unsigned_BigInt &B);
 
-unsigned_BigInt unsigned_read();
+unsigned_BigInt unsigned_read(char *s);
 
 
 
@@ -161,7 +178,7 @@ struct signed_BigInt
 };
 
 
-inline int compare(const signed_BigInt &A, const signed_BigInt &B);
+int compare(const signed_BigInt &A, const signed_BigInt &B);
 
 
 signed_BigInt operator + (const signed_BigInt &A, const signed_BigInt &B);
@@ -176,13 +193,27 @@ signed_BigInt operator / (const signed_BigInt &A, const signed_BigInt &B);
 
 signed_BigInt operator % (const signed_BigInt &A, const signed_BigInt &B);
 
-signed_BigInt signed_read();
+signed_BigInt signed_read(char *s);
 
-const unsigned_BigInt unsigned_Zero = 0;
-const unsigned_BigInt unsigned_One = 1;
+extern const unsigned_BigInt unsigned_Zero;
+extern const unsigned_BigInt unsigned_One;
 
-const signed_BigInt Zero = 0;
-const signed_BigInt One = 1;
-const signed_BigInt Minus_One = -1;
+extern const signed_BigInt Zero;
+extern const signed_BigInt One;
+extern const signed_BigInt Minus_One;
 
+
+
+bool is_even(const unsigned_BigInt &A);
+bool is_odd(const unsigned_BigInt &A);
+
+
+unsigned_BigInt Euclid_GCD(const unsigned_BigInt &A, const unsigned_BigInt &B);
+signed_BigInt Extended_Euclid_GCD(const signed_BigInt &A, const signed_BigInt &B, signed_BigInt &X, signed_BigInt &Y);
+
+
+unsigned_BigInt	Modular_Exponentiation(unsigned_BigInt A, unsigned_BigInt B, const unsigned_BigInt &N);
+
+
+unsigned_BigInt Get_Random(const int bits);
 
