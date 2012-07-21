@@ -25,7 +25,7 @@ struct Tsplay
 		
 	}
 		
-	inline void left_rotate(int x)
+	void left_rotate(int x)
 	{
 		int y = tree[x].father, z = tree[x].left;
 		if (y == tree[tree[y].father].left)
@@ -41,7 +41,7 @@ struct Tsplay
 		update(y); update(x);
 	}
 	
-	inline void right_rotate(int x)
+	void right_rotate(int x)
 	{
 		int y = tree[x].father, z = tree[x].right;
 		if (y == tree[tree[y].father].left)
@@ -59,7 +59,8 @@ struct Tsplay
 	
 	void splay(int x)
 	{
-		while (tree[x].father)
+		if (x == 0) return;
+		while (tree[x].father != 0)
 		{
 			int y = tree[x].father, z = tree[y].father;
 			if (z == 0)
@@ -98,7 +99,6 @@ struct Tsplay
 					}
 				}
 			}
-			
 		}
 		root = x;
 	}
@@ -120,41 +120,64 @@ struct Tsplay
 		return x;
 	}
 
+	bool exist(Data key)
+	{
+		if (root == 0) return false;
+		int x = find(root, key);
+		//if (x == 0) return false;
+		splay(x);
+		return (tree[x].key == key);
+	}
+
 	int maximum(int x)
 	{
-		splay(find(x, infinity));
+		//splay(find(x, infinity));
+		if (x == 0) return 0;
+		while (tree[x].right != 0)
+			x = tree[x].right;
+		splay(x);
 		return root;
 	}
 	
 	int minimum(int x)
 	{
-		splay(find(x, -infinity));
+		//splay(find(x, -infinity));
+		if (x == 0) return 0;
+		while (tree[x].left != 0)
+			x = tree[x].left;
+		splay(x);
 		return root;
 	}
 	
+	/* return the root of the joined tree */
 	int join(int x1, int x2)
 	{
 		if (x1 == 0) return x2;
 		if (x2 == 0) return x1;
 		int x = maximum(x1);
 		tree[x].right = x2; tree[x2].father = x;
-		update(root);
-		return root;
+		update(x);
+		return x;
 	}	
 
-	void split(int x, int &x1, int &x2)					//subtree x1: <= x, subtree x2: > x
+
+	/* subtree x1: <= x, subtree x2: > x */
+	void split(int x, int &x1, int &x2)					
 	{
 		splay(x);
-		x1 = x;
-		tree[x2 = tree[x].right].father = 0; tree[root].right = 0;
+		x1 = root;
+		tree[x2 = tree[root].right].father = 0; tree[root].right = 0;
 	}
-	
-	void split_with_delete(int x, int &x1, int &x2)			//delete the root, and split two subtrees
+
+	/* delete the root, and split two subtrees */
+	/*
+	void split_with_delete(int x, int &x1, int &x2)			
 	{
 		splay(x);
 		tree[x1 = tree[x].left].father = 0; tree[root].left = 0;
 		tree[x2 = tree[x].right].father = 0; tree[root].right = 0;
 	}
+	*/
 	
 	void insert(Data key)
 	{
@@ -197,20 +220,42 @@ struct Tsplay
 	
 	void remove(Data key)
 	{
+
+		if (!exist(key)) return;
+
+		if (tree[root].count > 1)
+		{
+			-- tree[root].count;
+			update(root);
+			return;
+		}		
+
+		/* split and join */
+		int x1 = tree[root].left;
+		int x2 = tree[root].right;
+
+		tree[x1].father = tree[x2].father = 0;
+		tree[root].left = tree[root].right = 0;
+
+		root = join(x1, x2);
+
 		/*
 			Search for the node containing key. Let this node be x and let its parent be y.
-			Replace x as a child of y by the join of the left and right subtrees of x, and then splay at y
-			Special Case: x is root or x is the only node in the tree
+			Replace x as a child of y by the join of the left and right subtrees of x, and then splay at y.
+			Special Case: x is root or x is the only node in the tree.
 		*/
+
+		/*
 		int x = find(root, key);
 		if (x == 0 || tree[x].key != key) return;
+		
 		if (tree[x].count > 1)
 		{
 			-- tree[x].count;
-			update(x);
 			splay(x);
+			update(x);
 			return;
-		}		
+		}
 		int y = tree[x].father;
 		tree[tree[x].left].father = tree[tree[x].right].father = 0;
 		int z = join(tree[x].left, tree[x].right);
@@ -228,7 +273,8 @@ struct Tsplay
 			update(y);
 			splay(y);
 		}
-		
+		*/
+
 	}
 
 	int prev(int x)
@@ -245,13 +291,6 @@ struct Tsplay
 		return minimum(tree[x].right);
 	}
 	
-	bool exist(Data key)
-	{
-		int x = find(root, key);
-		if (x == 0) return false;
-		splay(x);
-		return (tree[x].key == key);
-	}
 	
 	bool empty()
 	{
