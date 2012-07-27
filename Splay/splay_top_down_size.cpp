@@ -7,6 +7,7 @@ struct TreeNode
 {
 	int left, right;
 	int count;
+	int size;
 	Data key;
 };
 
@@ -19,13 +20,15 @@ struct Tsplay
 	{
 		root = top = 0;
 		memset(tree, 0, sizeof(tree));
+		tree[0].left = tree[0].right = 0;
+		tree[0].count = tree[0].size = 0;
 	}
-	
-	void update(int x)
+
+	inline void update(int x)
 	{
-		
+		tree[x].size = tree[tree[x].left].size + tree[tree[x].right].size + tree[x].count;
 	}
-	
+
 	void splay(int x, Data key)
 	{
 		if (x == 0) return;
@@ -36,6 +39,10 @@ struct Tsplay
 		//Splay_left.left = Splay_left.right = Splay_right.left = Splay_right.right = 0;
 		Cur_left = Cur_right = 0;
 		Split.left = Split.right = 0;
+
+		int Root_size = tree[x].size;
+		int L_size = 0;
+		int R_size = 0;
 		
 		for (;;)
 		{
@@ -44,7 +51,13 @@ struct Tsplay
 				if (tree[x].left == 0) break;
 				if (key < tree[tree[x].left].key)		/* rotate right */
 				{
-					int y = tree[x].left; tree[x].left = tree[y].right; tree[y].right = x; x = y;
+					int y = tree[x].left;
+					tree[x].left = tree[y].right;
+					tree[y].right = x;
+					update(x);
+					//tree[x].size = tree[tree[x].left].size + tree[tree[x].right].size + tree[x].count;
+					x = y;
+					update(x);
 					if (tree[x].left == 0) break;
 				}
 
@@ -56,6 +69,8 @@ struct Tsplay
 
 				Cur_right = x;
 				x = tree[x].left;
+
+				R_size += tree[Cur_right].count + tree[tree[Cur_right].right].size;
 				/*
 				Splay_right.left = x;
 				Cur_right = x;
@@ -67,7 +82,13 @@ struct Tsplay
 				if (tree[x].right == 0) break;
 				if (key > tree[tree[x].right].key)		/* rotate left */
 				{
-					int y = tree[x].right; tree[x].right = tree[y].left; tree[y].left = x; x = y;
+					int y = tree[x].right;
+					tree[x].right = tree[y].left;
+					tree[y].left = x;
+					update(x);
+					//tree[x].size = tree[tree[x].left].size + tree[tree[x].right].size + tree[x].count;
+				 	x = y;
+					update(x);
 					if (tree[x].right == 0) break;
 				}
 				
@@ -79,6 +100,7 @@ struct Tsplay
 
 				Cur_left = x;
 				x = tree[x].right;
+				L_size += tree[Cur_left].count + tree[tree[Cur_left].left].size;
 				/*
 				Splay_left.right = x;
 				Cur_left = x;
@@ -86,6 +108,23 @@ struct Tsplay
 				*/
 			}
 			else break;
+		}
+
+		L_size += tree[tree[x].left].size;
+		R_size += tree[tree[x].right].size;
+		tree[x].size = L_size + R_size + tree[x].count;
+
+		tree[Cur_left].right = tree[Cur_right].left = 0;
+
+		for (int i = Split.left; i != 0; i = tree[i].right)
+		{
+			tree[i].size = L_size;
+			L_size -= tree[i].count + tree[tree[i].left].size;
+		}
+		for (int i = Split.right; i != 0; i = tree[i].left)
+		{
+			tree[i].size = R_size;
+			R_size -= tree[i].count + tree[tree[i].right].size;
 		}
 
 		/* assemble */
@@ -207,19 +246,41 @@ struct Tsplay
 	}
 
 
+	int find_kth(int x, int k)
+	{
+		if (tree[x].size < k) return 0;
+		while (x != 0)
+		{
+			if (k > tree[tree[x].left].size && k <= tree[tree[x].left].size + tree[x].count)
+			{
+				splay(root, tree[x].key);
+				return root;
+			}
+			if (k <= tree[tree[x].left].size)
+				x = tree[x].left;
+			else
+			{
+				k -= tree[tree[x].left].size + tree[x].count;
+				x = tree[x].right;	
+			}
+		}
+		splay(root, tree[x].key);
+		return root;
+	}
+
 	bool empty()
 	{
 		return (root == 0);
 	}
-
+	
 };
 
 Tsplay set;
 
 int main()
 {
-	freopen("in", "r", stdin);
-	freopen("me", "w", stdout);
+	//freopen("in", "r", stdin);
+	//freopen("me", "w", stdout);
 	set.clear();
 	while (1)
 	{
@@ -297,6 +358,15 @@ int main()
 				printf("NULL\n");
 			else
 				printf("%d\n", set.tree[set.minimum(set.root)].key);
+		}
+		else if (operation == 5)
+		{
+			int key;
+			scanf("%d", &key);
+			if (set.empty())
+				printf("NULL\n");
+			else
+				printf("%d\n", set.tree[set.find_kth(set.root, key)].key);
 		}
 	}
 	return 0;

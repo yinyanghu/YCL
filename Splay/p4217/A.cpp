@@ -1,12 +1,13 @@
 #include <cstdio>
 #include <cstring>
 #define infinity 1000000000
-#define limitsize 1000000
+#define limitsize 700000
 typedef int Data;
 struct TreeNode
 {
 	int left, right, father;
 	int count;
+	int size;
 	Data key;
 };
 struct Tsplay
@@ -22,10 +23,11 @@ struct Tsplay
 	
 	inline void update(int x)
 	{
-		
+		tree[x].size = tree[tree[x].left].size + tree[tree[x].right].size + tree[x].count;
+		// for null node, we have tree[0].size = 0
 	}
 		
-	void left_rotate(int x)
+	inline void left_rotate(int x)
 	{
 		int y = tree[x].father, z = tree[x].left;
 		if (y == tree[tree[y].father].left)
@@ -41,7 +43,7 @@ struct Tsplay
 		update(y); update(x);
 	}
 	
-	void right_rotate(int x)
+	inline void right_rotate(int x)
 	{
 		int y = tree[x].father, z = tree[x].right;
 		if (y == tree[tree[y].father].left)
@@ -120,6 +122,7 @@ struct Tsplay
 		return x;
 	}
 
+
 	bool exist(Data key)
 	{
 		if (root == 0) return false;
@@ -128,6 +131,7 @@ struct Tsplay
 		splay(x);
 		return (tree[x].key == key);
 	}
+
 
 	int maximum(int x)
 	{
@@ -162,16 +166,17 @@ struct Tsplay
 
 
 	/* subtree x1: <= x, subtree x2: > x */
-	void split(int x, int &x1, int &x2)					
+	void split(int x, int &x1, int &x2)
 	{
 		splay(x);
 		x1 = root;
 		tree[x2 = tree[root].right].father = 0; tree[root].right = 0;
 	}
 
+
 	/* delete the root, and split two subtrees */
 	/*
-	void split_with_delete(int x, int &x1, int &x2)			
+	void split_with_delete(int x, int &x1, int &x2)
 	{
 		splay(x);
 		tree[x1 = tree[x].left].father = 0; tree[root].left = 0;
@@ -189,6 +194,7 @@ struct Tsplay
 		}
 		tree[++ top].key = key; tree[top].count = 1;
 		tree[top].left = tree[top].right = tree[top].father = 0;
+//		tree[top].size = 1;
 		if (root == 0)
 		{
 			root = top;
@@ -228,7 +234,7 @@ struct Tsplay
 			-- tree[root].count;
 			update(root);
 			return;
-		}		
+		}
 
 		/* split and join */
 		int x1 = tree[root].left;
@@ -241,21 +247,21 @@ struct Tsplay
 
 		/*
 			Search for the node containing key. Let this node be x and let its parent be y.
-			Replace x as a child of y by the join of the left and right subtrees of x, and then splay at y.
-			Special Case: x is root or x is the only node in the tree.
+			Replace x as a child of y by the join of the left and right subtrees of x, and then splay at y
+			Special Case: x is root or x is the only node in the tree
 		*/
 
 		/*
 		int x = find(root, key);
 		if (x == 0 || tree[x].key != key) return;
-		
+
 		if (tree[x].count > 1)
 		{
 			-- tree[x].count;
 			update(x);
 			splay(x);
 			return;
-		}
+		}		
 
 		int y = tree[x].father;
 		tree[tree[x].left].father = tree[tree[x].right].father = 0;
@@ -274,8 +280,30 @@ struct Tsplay
 			update(y);
 			splay(y);
 		}
+		
 		*/
+	}
 
+	int find_kth(int x, int k)
+	{
+		if (tree[x].size < k) return 0;
+		while (x != 0)
+		{
+			if (k > tree[tree[x].left].size && k <= tree[tree[x].left].size + tree[x].count)
+			{
+				splay(x);
+				return root;
+			}
+			if (k <= tree[tree[x].left].size)
+				x = tree[x].left;
+			else
+			{
+				k -= tree[tree[x].left].size + tree[x].count;
+				x = tree[x].right;	
+			}
+		}
+		splay(x);
+		return root;
 	}
 
 	int prev(int x)
@@ -302,84 +330,32 @@ struct Tsplay
 
 Tsplay set;
 
+int N, K;
+
 int main()
 {
-	freopen("in", "r", stdin);
-	freopen("me", "w", stdout);
-	set.clear();
-	while (1)
+	int test;
+	scanf("%d", &test);
+	for (int t = 1; t <= test; ++ t)
 	{
-		int operation;
-		scanf("%d", &operation);
-		if (operation == -1)
+		set.clear();
+		scanf("%d%d", &N, &K);
+		for (int i = 1; i <= N; ++ i)
+			set.insert(i);
+
+		long long ans = 0;
+
+		for (int i = 0; i < K; ++ i)
 		{
-			return 0;
+			int p;
+			scanf("%d", &p);
+			int k = set.tree[set.find_kth(set.root, p)].key;
+			ans = (long long)ans + k;
+			set.remove(k);
 		}
-		else if (operation == 0)
-		{
-			int key;
-			scanf("%d", &key);
-			set.insert(key);
-		}
-		else if (operation == 1)
-		{
-			int key;
-			scanf("%d", &key);
-			if (set.exist(key))
-			{
-				set.remove(key);
-				printf("OK\n");
-			}
-			else
-				printf("Delete Error\n");
-		}
-		else if (operation == 2)
-		{
-			int key;
-			scanf("%d", &key);
-			if (set.exist(key))
-				printf("Yes\n");
-			else
-				printf("No\n");
-		}
-		else if (operation == 3)
-		{
-			if (set.empty())
-				printf("NULL\n");
-			else
-				printf("%d\n", set.tree[set.maximum(set.root)].key);
-		}
-		else if (operation == 4)
-		{
-			if (set.empty())
-				printf("NULL\n");
-			else
-				printf("%d\n", set.tree[set.minimum(set.root)].key);
-		}
+
+		printf("Case %d: %I64d\n", t, ans);
 	}
+
 	return 0;
 }
-
-	/*
-
-
-	*/
-
-	/*
-	void remove(Data key)						//remove: split and join
-	{
-		int x = find(root, key);
-		if (key != tree[x].key) return;
-		if (tree[x].count > 1)
-
-		{
-			-- tree[x].count;
-			update(x);
-			return;
-		}
-
-		int s1, s2;
-		split_with_delete(x, s1, s2);
-		root = join(s1, s2);
-	}
-	*/

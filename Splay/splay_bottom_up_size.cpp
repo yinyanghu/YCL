@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #define infinity 1000000000
-#define limitsize 1000000
+#define limitsize 700000
 typedef int Data;
 struct TreeNode
 {
@@ -19,6 +19,8 @@ struct Tsplay
 	{
 		root = top = 0;
 		memset(tree, 0, sizeof(tree));
+		tree[0].left = tree[0].right = 0;
+		tree[0].count = tree[0].size = 0;
 	}
 	
 	inline void update(int x)
@@ -61,7 +63,8 @@ struct Tsplay
 	
 	void splay(int x)
 	{
-		while (tree[x].father)
+		if (x == 0) return;
+		while (tree[x].father != 0)
 		{
 			int y = tree[x].father, z = tree[y].father;
 			if (z == 0)
@@ -100,7 +103,6 @@ struct Tsplay
 					}
 				}
 			}
-			
 		}
 		root = x;
 	}
@@ -122,41 +124,67 @@ struct Tsplay
 		return x;
 	}
 
+
+	bool exist(Data key)
+	{
+		if (root == 0) return false;
+		int x = find(root, key);
+		//if (x == 0) return false;
+		splay(x);
+		return (tree[x].key == key);
+	}
+
+
 	int maximum(int x)
 	{
-		splay(find(x, infinity));
+		//splay(find(x, infinity));
+		if (x == 0) return 0;
+		while (tree[x].right != 0)
+			x = tree[x].right;
+		splay(x);
 		return root;
 	}
 	
 	int minimum(int x)
 	{
-		splay(find(x, -infinity));
+		//splay(find(x, -infinity));
+		if (x == 0) return 0;
+		while (tree[x].left != 0)
+			x = tree[x].left;
+		splay(x);
 		return root;
 	}
 	
+	/* return the root of the joined tree */
 	int join(int x1, int x2)
 	{
 		if (x1 == 0) return x2;
 		if (x2 == 0) return x1;
 		int x = maximum(x1);
 		tree[x].right = x2; tree[x2].father = x;
-		update(root);
-		return root;
+		update(x);
+		return x;
 	}	
 
-	void split(int x, int &x1, int &x2)					//subtree x1: <= x, subtree x2: > x
+
+	/* subtree x1: <= x, subtree x2: > x */
+	void split(int x, int &x1, int &x2)
 	{
 		splay(x);
-		x1 = x;
-		tree[x2 = tree[x].right].father = 0; tree[root].right = 0;
+		x1 = root;
+		tree[x2 = tree[root].right].father = 0; tree[root].right = 0;
 	}
-	
-	void split_with_delete(int x, int &x1, int &x2)			//delete the root, and split two subtrees
+
+
+	/* delete the root, and split two subtrees */
+	/*
+	void split_with_delete(int x, int &x1, int &x2)
 	{
 		splay(x);
 		tree[x1 = tree[x].left].father = 0; tree[root].left = 0;
 		tree[x2 = tree[x].right].father = 0; tree[root].right = 0;
 	}
+	*/
 	
 	void insert(Data key)
 	{
@@ -200,13 +228,35 @@ struct Tsplay
 	
 	void remove(Data key)
 	{
+
+		if (!exist(key)) return;
+
+		if (tree[root].count > 1)
+		{
+			-- tree[root].count;
+			update(root);
+			return;
+		}
+
+		/* split and join */
+		int x1 = tree[root].left;
+		int x2 = tree[root].right;
+
+		tree[x1].father = tree[x2].father = 0;
+		tree[root].left = tree[root].right = 0;
+
+		root = join(x1, x2);
+
 		/*
 			Search for the node containing key. Let this node be x and let its parent be y.
 			Replace x as a child of y by the join of the left and right subtrees of x, and then splay at y
 			Special Case: x is root or x is the only node in the tree
 		*/
+
+		/*
 		int x = find(root, key);
 		if (x == 0 || tree[x].key != key) return;
+
 		if (tree[x].count > 1)
 		{
 			-- tree[x].count;
@@ -214,6 +264,7 @@ struct Tsplay
 			splay(x);
 			return;
 		}		
+
 		int y = tree[x].father;
 		tree[tree[x].left].father = tree[tree[x].right].father = 0;
 		int z = join(tree[x].left, tree[x].right);
@@ -232,6 +283,7 @@ struct Tsplay
 			splay(y);
 		}
 		
+		*/
 	}
 
 	int find_kth(int x, int k)
@@ -239,7 +291,11 @@ struct Tsplay
 		if (tree[x].size < k) return 0;
 		while (x != 0)
 		{
-			if (k > tree[tree[x].left].size && k <= tree[tree[x].left].size + tree[x].count) return x;
+			if (k > tree[tree[x].left].size && k <= tree[tree[x].left].size + tree[x].count)
+			{
+				splay(x);
+				return root;
+			}
 			if (k <= tree[tree[x].left].size)
 				x = tree[x].left;
 			else
@@ -249,8 +305,9 @@ struct Tsplay
 			}
 		}
 		splay(x);
-		return x;
+		return root;
 	}
+
 	int prev(int x)
 	{
 		splay(x);
@@ -265,13 +322,6 @@ struct Tsplay
 		return minimum(tree[x].right);
 	}
 	
-	bool exist(Data key)
-	{
-		int x = find(root, key);
-		if (x == 0) return false;
-		splay(x);
-		return (tree[x].key == key);
-	}
 	
 	bool empty()
 	{
@@ -281,6 +331,7 @@ struct Tsplay
 };
 
 Tsplay set;
+
 
 int main()
 {
@@ -295,12 +346,6 @@ int main()
 		{
 			return 0;
 		}
-		/*
-		else if (operation == 0)
-		{
-			set.clear();
-		}
-		*/
 		else if (operation == 0)
 		{
 			int key;
@@ -328,28 +373,6 @@ int main()
 			else
 				printf("No\n");
 		}
-		/*
-		else if (operation == 4)
-		{
-			int key;
-			scanf("%d", &key);
-			int x = set.find(set.root, key);
-			if (set.tree[x].key == key)
-				printf("%d\n", set.tree[set.prev(x)].key);
-			else
-				printf("Prev Error!\n");
-		}
-		else if (operation == 5)
-		{
-			int key;
-			scanf("%d", &key);
-			int x = set.find(set.root, key);
-			if (set.tree[x].key == key)
-				printf("%d\n", set.tree[set.succ(x)].key);
-			else
-				printf("Succ Error!\n");
-		}
-		*/
 		else if (operation == 3)
 		{
 			if (set.empty())
@@ -366,34 +389,14 @@ int main()
 		}
 		else if (operation == 5)
 		{
-			int k;
-			scanf("%d", &k);
-			printf("%d\n", set.tree[set.find_kth(set.root, k)].key);
+			int key;
+			scanf("%d", &key);
+			if (set.empty())
+				printf("NULL\n");
+			else
+				printf("%d\n", set.tree[set.find_kth(set.root, key)].key);
 		}
 	}
 	return 0;
 }
 
-	/*
-
-
-	*/
-
-	/*
-	void remove(Data key)						//remove: split and join
-	{
-		int x = find(root, key);
-		if (key != tree[x].key) return;
-		if (tree[x].count > 1)
-
-		{
-			-- tree[x].count;
-			update(x);
-			return;
-		}
-
-		int s1, s2;
-		split_with_delete(x, s1, s2);
-		root = join(s1, s2);
-	}
-	*/
