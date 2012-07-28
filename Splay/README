@@ -1,0 +1,12 @@
+BU
+	Splay Tree, Bottom-up, Array
+BUS
+	Splay Tree, Bottom_up, with Size field, Array
+
+TD
+	Splay Tree, Top-down, Array
+TDS
+	Splay Tree, Top-down, with Size field, Array
+
+PBU
+	Splay Tree, Bottom-up, Pointer

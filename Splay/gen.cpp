@@ -1,7 +1,7 @@
 #include <cstdio>
 #include <ctime>
 #include <cstdlib>
-#define limit 10000000
+#define limit 50000000
 #define maxnum 10000
 int main()
 {

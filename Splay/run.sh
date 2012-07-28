@@ -10,3 +10,7 @@ echo ""
 echo "Splay Top Down"
 time ./Splay_TD
 diff me std
+echo ""
+echo "Splay Bottom Up Pointer"
+time ./Splay_PBU
+diff me std
