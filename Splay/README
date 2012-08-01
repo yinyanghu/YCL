@@ -10,3 +10,5 @@ TDS
 
 PBU
 	Splay Tree, Bottom-up, Pointer
+PTD
+	Splay Tree, Top-down, Pointer

@@ -20,6 +20,7 @@ struct Tsplay
 		memset(tree, 0, sizeof(tree));
 	}
 	
+	/*
 	void left_rotate(int x)
 	{
 		int y = tree[x].father, z = tree[x].left;
@@ -47,6 +48,7 @@ struct Tsplay
 		tree[y].father = x;
 		tree[z].father = y;
 	}
+	*/
 	
 	void splay(int x)
 	{
@@ -57,9 +59,29 @@ struct Tsplay
 			if (z == 0)
 			{
 				if (x == tree[y].left)
-					right_rotate(x);
+				{
+					tree[x].father = 0;	
+					if (tree[x].right != 0)
+						tree[tree[x].right].father = y;
+					tree[y].father = x;
+
+					tree[y].left = tree[x].right;
+					tree[x].right = y;
+
+					//right_rotate(x);
+				}
 				else
-					left_rotate(x);
+				{
+					tree[x].father = 0;
+					if (tree[x].left != 0)
+						tree[tree[x].left].father = y;
+					tree[y].father = x;
+
+					tree[y].right = tree[x].left;
+					tree[x].left = y;
+
+					//left_rotate(x);
+				}
 			}
 			else
 			{
@@ -67,26 +89,98 @@ struct Tsplay
 				{
 					if (y == tree[z].left)
 					{
-						right_rotate(y);
-						right_rotate(x);
+						if (z == tree[tree[z].father].left)
+							tree[tree[z].father].left = x;
+						else
+							tree[tree[z].father].right = x;
+
+						tree[x].father = tree[z].father;
+						tree[y].father = x;
+						tree[z].father = y;
+
+						if (tree[x].right != 0)
+							tree[tree[x].right].father = y;
+
+						if (tree[y].right != 0)
+							tree[tree[y].right].father = z;
+
+						tree[y].left = tree[x].right;
+						tree[z].left = tree[y].right;
+						tree[x].right = y;
+						tree[y].right = z;
+
+						//right_rotate(y);
+						//right_rotate(x);
 					}
 					else
 					{
-						right_rotate(x);
-						left_rotate(x);
+						if (z == tree[tree[z].father].left)
+							tree[tree[z].father].left = x;
+						else
+							tree[tree[z].father].right = x;
+
+						tree[x].father = tree[z].father;
+						tree[y].father = tree[z].father = x;
+
+						if (tree[x].right != 0)
+							tree[tree[x].right].father = y;
+						if (tree[x].left != 0)
+							tree[tree[x].left].father = z;
+
+						tree[y].left = tree[x].right;
+						tree[z].right=  tree[x].left;
+						tree[x].left = z;
+						tree[x].right = y;
+
+						//right_rotate(x);
+						//left_rotate(x);
 					}
 				}
 				else
 				{
 					if (y == tree[z].left)
 					{
-						left_rotate(x);
-						right_rotate(x);
+						if (z == tree[tree[z].father].left)
+							tree[tree[z].father].left = x;
+						else
+							tree[tree[z].father].right = x;
+
+						tree[x].father = tree[z].father;
+						tree[y].father = tree[z].father = x;
+
+						if (tree[x].left != 0)
+							tree[tree[x].left].father = y;
+						if (tree[x].right != 0)
+							tree[tree[x].right].father = z;
+
+						tree[y].right = tree[x].left;
+						tree[z].left = tree[x].right;
+						tree[x].left = y;
+						tree[x].right = z;
+						//left_rotate(x);
+						//right_rotate(x);
 					}
 					else
 					{
-						left_rotate(y);
-						left_rotate(x);
+						if (z == tree[tree[z].father].left)
+							tree[tree[z].father].left = x;
+						else
+							tree[tree[z].father].right = x;
+
+						tree[x].father = tree[z].father;
+						tree[y].father= x;
+						tree[z].father = y;
+						if (tree[x].left != 0)
+							tree[tree[x].left].father = y;
+						if (tree[y].left != 0)
+							tree[tree[y].left].father = z;
+
+						tree[y].right = tree[x].left;
+						tree[z].right = tree[y].left;
+						tree[x].left = y;
+						tree[y].left = z;
+						//left_rotate(y);
+						//left_rotate(x);
 					}
 				}
 			}

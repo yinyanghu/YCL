@@ -301,7 +301,7 @@ struct Tsplay
 
 		if (Root -> count > 1)
 		{
-			-- Root -> count;
+			-- (Root -> count);
 			return;
 		}
 
